@@ -5,8 +5,10 @@
 
 char nomes[50][50];
 float precos[50];
-int estoque [50];
+int estoque[50];
 int total = 0;
+
+float totalVendido = 0;
 
 // LOGIN
 int login() {
@@ -27,14 +29,19 @@ int login() {
 
 // CADASTRAR
 void cadastrar() {
-    printf("\nNome do produto: ");
-    scanf("%s", nomes[50]);
+    if (total >= 50) {
+        printf("\nLIMITE DE PRODUTOS ATINGIDO!\n");
+        return;
+    }
 
-    printf("Preço: ");
-    scanf("%f", &precos[50]);
+    printf("\nNome do produto: ");
+    scanf("%s", nomes[total]);
+
+    printf("PreÃ§o: ");
+    scanf("%f", &precos[total]);
 
     printf("Quantidade no estoque: ");
-    scanf("%d", &estoque[50]);
+    scanf("%d", &estoque[total]);
 
     total++;
 
@@ -51,65 +58,55 @@ void listar() {
     printf("\nPRODUTOS CADASTRADOS\n");
 
     for (int i = 0; i < total; i++) {
-        printf("%d - %s | R$ %.2f\n | Estoque: %d\n", i + 1, nomes[i], precos[i], estoque[i]);
+        printf("%d - %s | R$ %.2f | Estoque: %d\n",
+                i + 1, nomes[i], precos[i], estoque[i]);
     }
 
     printf("\n");
 }
-    // COMPRAR
-    void comprar(){
+
+// COMPRAR
+void comprar() {
     int codigo, quantidade;
 
-    if (total == 0){
+    if (total == 0) {
         printf("\nSem produto cadastrado para comprar\n");
         return;
     }
     listar();
 
-    printf("Digite o código do produto");
+    printf("Digite o cÃ³digo do produto: ");
     scanf("%d", &codigo);
     codigo--;
 
-    if (codigo < 0 || codigo>= total){
-        printf("Código Inválido");
+    if (codigo < 0 || codigo >= total) {
+        printf("CÃ³digo InvÃ¡lido\n");
         return;
     }
     printf("Quantidade que deseja: ");
     scanf("%d", &quantidade);
 
-    if(quantidade <= 0){
-        printf("Quantidade Inválida\n");
+    if (quantidade <= 0) {
+        printf("Quantidade InvÃ¡lida\n");
         return;
     }
-    if(quantidade > estoque[codigo]){
+    if (quantidade > estoque[codigo]) {
         printf("Estoque insuficiente. Atual estoque: %d\n", estoque[codigo]);
         return;
     }
 
     estoque[codigo] -= quantidade;
 
-    printf("Compra feita. Estoque restante de %s: %d\n", nomes[codigo], estoque[codigo]);
-    }
-    // BAIXO ESTOQUE
-    void estoqueBaixo(){
-    int encontrou = 0;
+    float valorCompra = quantidade * precos[codigo];
+    totalVendido += valorCompra;
 
-    printf("\nRELATÓRIO DE ESTOQUE BAIXO\n");
-
-    for (int i =0; i< total; i++){
-        if (estoque[i] <= 5){
-            printf("%s | Estoque: %d | Preço: R$ %.2f\n", nomes[i], estoque[i], precos[i]);
-            encontrou = 1;
-        }
-    }
-
-    if (!encontrou){
-        printf("Sem produto com baixo estoque\n");
-    }
-
-    printf("\n");
-
-    }
+    printf("Compra feita. Total da compra: R$ %.2f\n", valorCompra);
+    printf("Estoque restante de %s: %d\n\n", nomes[codigo], estoque[codigo]);
+}
+//TOTAL VENDIDO
+void mostrarTotalVendido(){
+    printf("VALOR TOTAL: R$ %.2f\n\n", totalVendido);
+}
 
 // MAIN E MENU
 int main() {
@@ -124,30 +121,44 @@ int main() {
     }
 
     do {
-        printf("\n--- MENU ---\n");
+        printf("\n---- MENU ----\n");
         printf("1 - Cadastrar\n");
         printf("2 - Listar\n");
         printf("3 - Comprar\n");
-        printf("4 - Sair\n");
-        printf("5 - Relatório de Baixo Estoque\n");
-        printf("\nOpção: ");
+        printf("4 - Total de Compras\n");
+        printf("5 - Sair\n");
+        printf("\nOpÃ§Ã£o: \n");
         scanf("%d", &opcao);
 
-        if (opcao == 1) {
+       switch (opcao){
+        case 1:
             cadastrar();
-        }
-        else if (opcao == 2) {
+            break;
+
+        case 2:
             listar();
-        }
-    else if(opcao == 3){
-        comprar();
-    }
-        else if (opcao == 5 ){
-            estoqueBaixo();
-        }
+            break;
 
-    } while (opcao != 4);
+        case 3:
+            comprar();
+            break;
 
-    printf("Saindo\n");
+        case 4:
+            mostrarTotalVendido();
+            break;
+
+        case 5:
+            printf("Saindo");
+            break;
+
+        default:
+            printf("\nOpÃ§Ã£o InvÃ¡lida\n");
+            break;
+       }
+
+
+    } while (opcao != 5);
+
     return 0;
 }
+
